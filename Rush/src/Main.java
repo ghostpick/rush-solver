@@ -24,28 +24,28 @@ public class Main extends Application {
         // from http://cs.ulb.ac.be/~fservais/rushhour/index.php?window_size=20&offset=0
     	
        /* String map = "333BCC" +
-                     "B22BCC" +
-                     "B.XXCC" +
-                     "22B..." +
-                     ".BB.22" +
-                     ".B2222";
+                       "B22BCC" +
+                       "B-##CC" +
+                       "22B---" +
+                       "-BB-22" +
+                       "-B2222";
     	*/
     	
-    	/* String map = "333A.B" +
-			        "A22AAB" +
-			        "A.XXAB" +
-			        "22A..." +
-			        ".AA.22" +
-			        ".A2222";*/
+    	/* String map = "333A-B" +
+			            "A22AAB" +
+			            "A.##AB" +
+			            "22A---" +
+			            "-AA-22" +
+			            "-A2222";*/
 
-    	String map = "333A.B" +
-			         "A22AAB" +
-			         "A.XXAB" +
-			         "22A..." +
-			         "..A..." +
-			         "......";
+    	String map = "-22--B" +
+			         "333A-B" +
+			         "##BAAB" +
+			         "--B-A-" +
+			         "--B---" +
+			         "-22---";
     	
-    	Solver solver = new Solver(map);
-    
+    	Solver solver = new Solver(map,6,6, true);
+    	solver.applyAlgorithm();
 	}
 }
