@@ -1,5 +1,9 @@
 package api;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.*;
 
 public class Solver {
@@ -15,6 +19,14 @@ public class Solver {
     final char						EMPTY 				= '-';    		  // empty space, movable into
     final char 						OUT_OF_BOUND		= 'X';    		  // represents everything out of bound
     final String 					LINE_BREAK 			= "\n";
+  
+    final int 						MOVE_UP				= -1;
+    final int 						MOVE_DOWN			=  1;
+    final int 						MOVE_LEFT			= -1;
+    final int 						MOVE_RIGHT			=  1;
+    final int 						OWN_POSITION		=  1;
+    final int 						NULL_ROW		    =  0;
+    final int 						NULL_COL		    =  0;
     
     // Variables
 	private int 					gv_boardRows		= 0;
@@ -23,9 +35,6 @@ public class Solver {
     private HashMap<String,String>	gt_stateMap			= null; // <currentState,previousState> 
     private Queue<String> 			gv_queue 			= null; // the breadth first search queue
     private boolean 				gv_trace 			= false;
-    
-    private ArrayList<Position> 		gv_arrMap		= new ArrayList<Position>();
-    private Queue<ArrayList<Position>> 	gv_queue1 		= null; // the breadth first search queue
 
     
     /////////////////////////////////////////////////////////////////////////////// PUBLIC SECTION
@@ -44,18 +53,17 @@ public class Solver {
     	
     	//convert to matrix
     	Parser par = new Parser();
-    	this.gv_arrMap = par.setArrMap(this.gv_boardRows, this.gv_boarColumns, this.gv_initialMap);
     }
     
     // solve rush problem
     public void applyAlgorithm(){
     	String 				lv_currentSate = "";
-    	ArrayList<Position> lv_currentState  = new ArrayList<Position>();
     	char content = ' ';
     	
         while (!this.gv_queue.isEmpty()) {
         	lv_currentSate = this.gv_queue.remove();
         	content 	   = this.getContent(lv_currentSate, POSITION_INITIAL, POSITION_GOAL);
+        	
         	
         	// GOAL
         	if (content == MY_CAR){      	
@@ -82,7 +90,10 @@ public class Solver {
         if (!this.gt_stateMap.containsKey(nextState)) {
         	this.gt_stateMap.put(nextState, prevState);
             this.gv_queue.add(nextState);
+            log(nextState, true);
+
         }
+
     }
 
     
@@ -98,26 +109,39 @@ public class Solver {
     // The n? counts how many spaces are there in a given direction, origin inclusive.
     // Cars matching the type will then slide on these "alleys".
 
+    static int c = 0;
+    
     private void expand(String current) {
-    	int  lv_front, lv_back, lv_left, lv_right = 0;
+    	int  lv_up, lv_down, lv_left, lv_right,lv_maxHorizontalMove, lv_maxVerticalMove = 0;
     	char content = ' ';
+    	
+        log(Integer.toString(c), false);
+//        log(current, true);
+
     	
         for (int row = 0; row < this.gv_boardRows; row++) {
             for (int col = 0; col < this.gv_boarColumns; col++) {
             	content = getContent(current, row, col);
             	
                 if (content == EMPTY) {
-                	lv_front  = countSpaces(current, row, col, -1, 0);
-                	lv_back   = countSpaces(current, row, col, +1, 0);
-                	lv_left   = countSpaces(current, row, col, 0, -1);
-                	lv_right  = countSpaces(current, row, col, 0, +1);
-                	move(current, row, col, V_CAR, lv_front, -1,  0, lv_front + lv_back - 1);
-                	move(current, row, col, V_CAR, lv_back,  +1,  0, lv_front + lv_back - 1);
-                	move(current, row, col, H_CAR, lv_left,   0, -1, lv_left  + lv_right - 1);
-                	move(current, row, col, H_CAR, lv_right,  0, +1, lv_left  + lv_right - 1);
+                	lv_up     = countSpaces(current, row, col, MOVE_UP,   NULL_COL);
+                	lv_down   = countSpaces(current, row, col, MOVE_DOWN, NULL_COL);
+                	lv_left   = countSpaces(current, row, col, NULL_ROW,  MOVE_LEFT);
+                	lv_right  = countSpaces(current, row, col, NULL_ROW,  MOVE_RIGHT);
+                	
+                	lv_maxHorizontalMove = lv_left + lv_right - OWN_POSITION;
+           			lv_maxVerticalMove	 = lv_up  + lv_down  - OWN_POSITION;
+                	
+                	move(current, row, col, V_CAR, lv_up,    MOVE_UP,    NULL_COL,   lv_maxVerticalMove);
+                	move(current, row, col, V_CAR, lv_down,  MOVE_DOWN,  NULL_COL,   lv_maxVerticalMove);
+                	move(current, row, col, H_CAR, lv_left,  NULL_ROW,   MOVE_LEFT,  lv_maxHorizontalMove);
+                	move(current, row, col, H_CAR, lv_right, NULL_ROW,   MOVE_RIGHT, lv_maxHorizontalMove);
+                	
                 }
             }
         }
+        c++;
+
     }
     
     // in a given state, starting from given coordinate, toward the given direction,
@@ -145,9 +169,9 @@ public class Solver {
     //      \___/
     //      distance
     //
-    private void move(String current, int row, int col, String type, int distance, int distRow, int distCol, int n) {
-    	row += distance * distRow;
-    	col += distance * distCol;
+    private void move(String current, int row, int col, String type, int numberSpaces, int distRow, int distCol, int n) {
+    	row += numberSpaces * distRow;
+    	col += numberSpaces * distCol;
         char content = getContent(current, row, col);
         
         if ((type.indexOf(content) == -1))
@@ -179,7 +203,7 @@ public class Solver {
         else if ((CAR_SMALL.indexOf(car) != -1))
         	return 2;
         else 
-        	return 0/0;
+        	return 0;
     }
 
     // in given state, returns the entity at a given coordinate, possibly out of bound
@@ -191,7 +215,39 @@ public class Solver {
     		return OUT_OF_BOUND;    
     }
     
+    
+    //log
+    private void log(String current, boolean state){
+    	String currentState = LINE_BREAK;
 
+    	if (state){
+	        
+	    	for(int i = 0; i < current.length(); i++){
+	    		currentState += current.charAt(i);
+	    		
+	    		if ((i+1)%this.gv_boardRows == 0)
+	    			currentState += LINE_BREAK;
+	    	}
+    	}
+    	else
+    		currentState = current + LINE_BREAK;
+
+    	
+        //System.out.println("EXPAND :" + c);
+
+        try(FileWriter fw = new FileWriter("outfilename.txt", true);
+    		    BufferedWriter bw = new BufferedWriter(fw);
+    		    PrintWriter out = new PrintWriter(bw)){
+    	   
+    		    //more code
+    		    out.println(currentState);
+    		    //more code
+    		} catch (IOException e) {
+    		    //exception handling left as an exercise for the reader
+    		}
+        //c++;
+    }
+    
     // trace recursion
     private int printSteps(String current) {
         String prev = this.gt_stateMap.get(current);

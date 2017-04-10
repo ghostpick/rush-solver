@@ -1,34 +1,30 @@
 package api;
 
 import java.util.ArrayList;
-import api.Position;
+import java.util.List;
 
 public class Parser {
 	
-	private ArrayList<Position> arrMap;
+	private List<List<Character>> arrMap;
+
+	Parser(){}
 	
-	
-	Parser(){
+	public List<List<Character>> setArrMap (int rows, int cols, String map){
 		
-	}
-	
-	public ArrayList<Position> setArrMap (int rows, int cols, String map){
+		this.arrMap = new ArrayList<List<Character>>();
 		
-		arrMap 			= new ArrayList<Position>();
-		Position lv_pos = new Position();
-		
-		for(int i = 0; i < rows; i++)
+		for(int i = 0; i < rows; i++){
+			List<Character>  lv_array = new ArrayList<Character>();
+			
 			for(int j = 0; j < cols; j++){
-				lv_pos.content = map.charAt(matrixToString(rows,i,j));
-				lv_pos.x	   = i;
-				lv_pos.y	   = j;
-				arrMap.add(lv_pos);
+				lv_array.add(map.charAt(matrixToString(rows,i,j)));
 			}
-		
-		
+			this.arrMap.add(lv_array);
+		}
+				
 		return this.arrMap;
 	}
-	
+
     private int matrixToString(int totalRows, int currentRow, int col) {
         return currentRow * totalRows + col;
     }

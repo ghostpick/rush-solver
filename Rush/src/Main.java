@@ -18,12 +18,12 @@ public class Main extends Application {
     public static void main(String[] args) {
        // launch(args);
 
-    	String map = "--11--" +
+    	String map = "------" +
 			         "-222A-" +
 			         ">>-BA-" +
 			         "---B--" +
 			         "---B--" +
-			         "--11--";
+			         "------";
     	
     	Solver solver = new Solver(map,6,6, true);
     	solver.applyAlgorithm();
