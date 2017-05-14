@@ -1,4 +1,4 @@
-package api;
+package api.BFS;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.*;
 
-public class Solver {
+public class BFS {
 
     // static parameters
     final int 						POSITION_INITIAL	= 2;
@@ -35,10 +35,11 @@ public class Solver {
     private HashMap<String,String>	gt_stateMap			= null; // <currentState,previousState> 
     private Queue<String> 			gv_queue 			= null; // the breadth first search queue
     private boolean 				gv_trace 			= false;
+    private String 					gv_src				= "files/results/bfs_solver.txt";
 
     
     /////////////////////////////////////////////////////////////////////////////// PUBLIC SECTION
-    public Solver(String map, int lines,int columns, boolean trace){
+    public BFS(String map, int lines,int columns, boolean trace){
     	
     	// initialize variables
     	this.gv_boardRows 	= lines;
@@ -50,9 +51,6 @@ public class Solver {
     	
     	// initial state
     	this.saveState(this.gv_initialMap, null);
-    	
-    	//convert to matrix
-    	Parser par = new Parser();
     }
     
     // solve rush problem
@@ -235,7 +233,7 @@ public class Solver {
     	
         //System.out.println("EXPAND :" + c);
 
-        try(FileWriter fw = new FileWriter("outfilename.txt", true);
+        try(FileWriter fw = new FileWriter(gv_src, true);
     		    BufferedWriter bw = new BufferedWriter(fw);
     		    PrintWriter out = new PrintWriter(bw)){
     	   
