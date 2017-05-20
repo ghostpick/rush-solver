@@ -79,7 +79,6 @@ public class AStar {
 
     }
     
-    // Idea from: http://web.mit.edu/eranki/www/tutorials/search/
     private void keepBetterNodeOnOpenList(HNode successor) {
     	HNode existing = open.get(successor);
     	

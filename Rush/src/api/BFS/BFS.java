@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.*;
 
+import api.Global;
+
 public class BFS {
 
     // static parameters
@@ -54,21 +56,36 @@ public class BFS {
     }
     
     // solve rush problem
-    public void applyAlgorithm(){
-    	String 				lv_currentSate = "";
-    	char content = ' ';
+    public ArrayList<String> applyAlgorithm(){
+    	String lv_currentSate = "";
+    	char   lv_content     = ' ';
+    	int    lv_steps       = 0;
+    	long   lv_startTime   = System.currentTimeMillis();
+    	ArrayList<String> rt_statistics = new ArrayList<String>();
+
     	
         while (!this.gv_queue.isEmpty()) {
         	lv_currentSate = this.gv_queue.remove();
-        	content 	   = this.getContent(lv_currentSate, POSITION_INITIAL, POSITION_GOAL);
+        	lv_content 	   = this.getContent(lv_currentSate, POSITION_INITIAL, POSITION_GOAL);
         	
         	
         	// GOAL
-        	if (content == MY_CAR){      	
+        	if (lv_content == MY_CAR){      	
             	
             	if(this.gv_trace){
-            		this.printSteps(lv_currentSate);
-                	System.out.println(this.gt_stateMap.size() + " expanded");	
+            		long lv_endTime   = System.currentTimeMillis();
+            		long lv_totalTime = lv_endTime - lv_startTime;
+            		lv_steps          = this.printSteps(lv_currentSate);
+            	
+            		
+                	System.out.println(
+                			Global.PRINT_STEPS_01     + lv_steps     + Global.PRINT_SEPARATOR +
+                			Global.PRINT_DURATION_01  + lv_totalTime + Global.PRINT_SEPARATOR +
+							Global.PRINT_EXPNODES_01  + this.gt_stateMap.size());	
+                	
+                	rt_statistics.add(Integer.toString(lv_steps));
+                	rt_statistics.add(Long.toString(lv_totalTime));
+                	rt_statistics.add(Integer.toString(this.gt_stateMap.size()));              	
             	}
             	
             	/* we don't need to continue in the while, even the 
@@ -77,7 +94,8 @@ public class BFS {
             }
             else
             	this.expand(lv_currentSate);
-        }        
+        }
+		return rt_statistics;        
     }
         
     /////////////////////////////////////////////////////////////////////////////// PRIVATE SECTION
@@ -89,7 +107,6 @@ public class BFS {
         	this.gt_stateMap.put(nextState, prevState);
             this.gv_queue.add(nextState);
             log(nextState, true);
-
         }
 
     }
@@ -184,7 +201,7 @@ public class BFS {
             sb.setCharAt(matrixToString(row, col), content);
             sb.setCharAt(matrixToString(row + L * distRow, col + L * distCol), EMPTY);
             saveState(sb.toString(), current);
-            current = sb.toString(); // comment to combo as one step
+            //current = sb.toString(); // step-step
         }
     }
         

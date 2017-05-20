@@ -1,4 +1,6 @@
 import java.io.IOException;
+import java.util.ArrayList;
+
 import api.GeneralFeatures;
 import api.Global;
 import api.BFS.*;
@@ -6,7 +8,8 @@ import api.AStar.*;
 import api.AStar.Heuristics.*;
 
 public class Main  {
-	
+	static ArrayList<String> lv_bfs_statistics = new ArrayList<String>();
+
     public static void main(String[] args){	
 
 
@@ -17,8 +20,8 @@ public class Main  {
 			         "---B--" +
 			         "------";
     	
-    	BFS bfs_solver = new BFS(map,6,6, true);
-    	bfs_solver.applyAlgorithm();
+    	BFS bfs_solver    = new BFS(map,6,6, true);
+    	lv_bfs_statistics = bfs_solver.applyAlgorithm();
     	
     	astar_solver_applyAlgorithm();
 	}
@@ -33,45 +36,42 @@ public class Main  {
     	catch (IOException e) {
     		e.printStackTrace();
     	}
-
-    		boolean showTime = false;
     	
     		String[] heuristic_names = null;
     		int num_puzzles = puzzles.length; // puzzles.length;
     		int num_heuristics = 0;
 
     		int[][] num_expanded = null;
-    		int[][] soln_depth = null;
+    		int[][] steps = null;
     		long[][] duration = null;
 
     		// run each heuristic on each puzzle
     		for (int i = 0; i < num_puzzles; i++) {
-    			System.out.println(Global.PRINT_LINE);
-    			System.out.println("puzzle = " + puzzles[i].getName());
+    			System.out.println(Global.PRINT_RESULT_TBL_04);
+    			System.out.println(Global.PRINT_PUZZLE + puzzles[i].getName());
     			
     			// h(x) used in A*
     			Heuristic[] heuristics = {
-    					new ZeroHeuristic(puzzles[i]),
+    					new DFS(puzzles[i]),
     					new BlockingHeuristic(puzzles[i]),
     					new AdvancedHeuristic(puzzles[i])
     				};
 
     			if (i == 0) {
-    				num_heuristics = heuristics.length;
-    				num_expanded = new int[num_puzzles][num_heuristics];
-    				soln_depth = new int[num_puzzles][num_heuristics];
-    				duration = new long[num_puzzles][num_heuristics];
-
+    				num_heuristics  = heuristics.length;
+    				num_expanded    = new int[num_puzzles][num_heuristics];
+    				steps           = new int[num_puzzles][num_heuristics];
+    				duration        = new long[num_puzzles][num_heuristics];
     				heuristic_names = new String[num_heuristics];
+    				
     				for (int h = 0; h < num_heuristics; h++)
-    					heuristic_names[h] = heuristics[h].getClass().getName();
+    					heuristic_names[h] = heuristics[h].getHeuristicName();
     			}
 
     			for (int h = 0; h < num_heuristics; h++) {
-    				System.out.println();
-    				System.out.println("------------------------------------");
-    				System.out.println();
-    				System.out.println("heuristic = " + heuristic_names[h]);
+    			
+    				System.out.println(Global.PRINT_RESULT_TBL_05);
+    				System.out.println(Global.PRINT_HEURISTIC + heuristic_names[h] + Global.LINE_BREAK);
 
     				puzzles[i].resetSearchCount();
     				
@@ -81,7 +81,7 @@ public class Main  {
 
     				if (search.path == null) {
     					System.out.println("NO SOLUTION FOUND.");
-    					soln_depth[i][h] = -1;
+    					steps[i][h] = -1;
     				} 
     				else {
 
@@ -91,10 +91,12 @@ public class Main  {
     					}
 
     					num_expanded[i][h] = puzzles[i].getSearchCount();
-    					soln_depth[i][h] = search.path.length - 1;
+    					steps[i][h] = search.path.length - 1;
     					duration[i][h] = endTime - startTime;
 
-    					System.out.println("nodes expanded: " + num_expanded[i][h] + ", soln depth: " + soln_depth[i][h] + ", duration: " + duration[i][h]);
+    					System.out.println(Global.PRINT_STEPS_01    + steps[i][h]    + Global.PRINT_SEPARATOR +
+    									   Global.PRINT_DURATION_01 + duration[i][h] + Global.PRINT_SEPARATOR  +
+    									   Global.PRINT_EXPNODES_01 + num_expanded[i][h] );
 
     				}
     			}
@@ -103,9 +105,8 @@ public class Main  {
     		GeneralFeatures generalFeatures = new GeneralFeatures();
     		generalFeatures.log_tableResults(num_heuristics,
     										 heuristic_names, 
-    										 showTime, 
     										 num_puzzles,
-    										 soln_depth, 
+    										 steps, 
     										 num_expanded, 
     										 puzzles, 
     										 duration);

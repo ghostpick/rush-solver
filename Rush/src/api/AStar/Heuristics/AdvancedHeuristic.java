@@ -1,7 +1,6 @@
 package api.AStar.Heuristics;
 
 import java.util.ArrayList;
-
 import api.AStar.Puzzle;
 import api.AStar.State;
 
@@ -12,7 +11,8 @@ import api.AStar.State;
  * here, filling in the constructor and the <tt>getValue</tt> method.
  */
 public class AdvancedHeuristic implements Heuristic {
-
+	
+	private String name = "ADVANCED HEURISTIC";
 	private Puzzle puzzle;
 	private State state;
 	private int numCars;
@@ -31,6 +31,7 @@ public class AdvancedHeuristic implements Heuristic {
 	 * This method returns the value of the heuristic function at the given
 	 * state.
 	 */
+	@Override
 	public int getValue(State state) {
 		this.state = state;
 		this.visited.clear();
@@ -41,6 +42,9 @@ public class AdvancedHeuristic implements Heuristic {
 		
 		return this.getMinimumRequiredMoves(state);
 	}
+	
+	@Override
+	public String getHeuristicName() { return this.name; }
 	
 	private int getMinimumRequiredMoves(State state) {
 		visited.add(0);

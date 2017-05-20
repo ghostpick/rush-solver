@@ -12,6 +12,7 @@ import api.AStar.State;
  */
 public class BlockingHeuristic implements Heuristic {
 	
+	private String name = "BLOCKING HEURISTIC";
 	private Puzzle puzzle;		// The current puzzle to evaluate heuristics on
 	private int numCars;        // The total number of cars on the jam
 	private int carPosFixed;	// The initial fixed position of our car
@@ -31,6 +32,7 @@ public class BlockingHeuristic implements Heuristic {
 	 * This method returns the value of the heuristic function at the given
 	 * state.
 	 */
+	@Override
 	public int getValue(State state) {
 		
 		// Return 0, if state equals goal state (No further heuristics needed)
@@ -71,5 +73,7 @@ public class BlockingHeuristic implements Heuristic {
 		
 		return blocking;
 	}
-
+	
+	@Override
+	public String getHeuristicName() { return this.name; }
 }
