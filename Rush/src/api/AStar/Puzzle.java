@@ -3,6 +3,10 @@ package api.AStar;
 import java.io.*;
 import java.util.*;
 
+import com.sun.org.apache.bcel.internal.generic.BREAKPOINT;
+
+import api.Global;
+
 /**
  * This is the class for representing a particular rush hour puzzle. Methods are
  * provided for accessing information about a puzzle, and also for reading in a
@@ -24,16 +28,18 @@ public class Puzzle {
 
 	private String name;
 	private Node initNode;
-
 	private int searchCount;
-
 	private int numCars;
 	private int fixedPos[];
 	private int carSize[];
 	private boolean carOrient[];
-
 	private int gridSize;
-
+	private static ArrayList<String> arr_bfsMaps = new ArrayList<String> ();
+	
+	public static ArrayList<String> get_arr_bfsMaps() {
+		return arr_bfsMaps;
+	}
+	
 	/** Returns the number of cars for this puzzle. */
 	public int getNumCars() {
 		return numCars;
@@ -227,6 +233,12 @@ public class Puzzle {
 				}
 
 				puzzles.add(new Puzzle(name, gridsize, numcars, orient, size, x, y));
+				import_toBFS(gridsize, numcars, orient, size, x, y);
+				
+				
+				
+			    
+			   
 				read_mode = 0;
 			} else {
 				CarRec carrec = new CarRec();
@@ -275,6 +287,87 @@ public class Puzzle {
 		return (Puzzle[]) puzzles.toArray(new Puzzle[0]);
 	}
 
+	
+	public static void import_toBFS(int gridsize, int car_total, boolean car_orient[], int size[], int x[], int y[]){
+			
+		StringBuilder lv_map_builder = new StringBuilder();
+		
+		char[][] darray = new char [gridsize][gridsize];
+		int interations = 0;
+		boolean l_orient;
+		int xx;
+		int yy;
+		int size_car;
+		int temp_inc = 0;;
+		char val = '-';			
+
+
+
+
+for(int a=0; a < gridsize; a++){
+			for(int b=0; b < gridsize; b++){
+				darray[a][b] = '-';
+			}
+		}
+		
+
+	    while(interations != car_total){
+	    	l_orient    =  car_orient[interations];
+	    	xx		    =  x[interations];
+	    	yy		    =  y[interations];
+	    	size_car    =  size[interations];
+	    	
+	    	if(interations == 0){
+	    		val = Global.BFS_MYCAR;
+	    		temp_inc =  xx;
+	    	}
+	    	else if (size_car == 2 && !l_orient){
+	    		val = Global.BFS_H2;
+	    		temp_inc =  xx;
+	    	}
+	    	else if (size_car == 3 && !l_orient){
+	    		val = Global.BFS_H3;
+	    		temp_inc =  xx;	
+	    	}
+	    	else if (size_car == 2 && l_orient){
+	    		val = Global.BFS_V2;
+	    		temp_inc =  yy;
+	    	}
+	    	else if (size_car == 3 && l_orient){
+	    		val = Global.BFS_V3;
+	    		temp_inc =  yy;
+	    	}
+	    	
+	    	
+	    	while(size_car > 0){
+	    		if(!l_orient){
+	    			darray[yy][temp_inc] = val;
+	    			temp_inc = temp_inc + 1;
+	    		}
+	    		else{
+	    			darray[temp_inc][xx] = val;
+		    		temp_inc = temp_inc + 1;
+	    		}
+	    			
+	    		size_car = size_car - 1;
+					
+				}
+	    	interations+=1;
+	    	}
+	
+	    
+	    //Mapping to string
+		for(int a=0; a < gridsize; a++){
+			for(int b=0; b < gridsize; b++)
+				lv_map_builder.append(darray[a][b]);
+		}
+		arr_bfsMaps.add(lv_map_builder.toString());   
+	}
+	
+	
+	
+	
+	
 	private static class CarRec {
 		boolean orient;
 		int size;

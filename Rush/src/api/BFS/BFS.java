@@ -38,6 +38,7 @@ public class BFS {
     private Queue<String> 			gv_queue 			= null; // the breadth first search queue
     private boolean 				gv_trace 			= false;
     private String 					gv_src				= "files/results/bfs_solver.txt";
+    private int					    gv_visitedNodes		= 0;
 
     
     /////////////////////////////////////////////////////////////////////////////// PUBLIC SECTION
@@ -85,7 +86,7 @@ public class BFS {
                 	
                 	rt_statistics.add(Integer.toString(lv_steps));
                 	rt_statistics.add(Long.toString(lv_totalTime));
-                	rt_statistics.add(Integer.toString(this.gt_stateMap.size()));              	
+                	rt_statistics.add(Integer.toString(gv_visitedNodes));              	
             	}
             	
             	/* we don't need to continue in the while, even the 
@@ -137,7 +138,7 @@ public class BFS {
         for (int row = 0; row < this.gv_boardRows; row++) {
             for (int col = 0; col < this.gv_boarColumns; col++) {
             	content = getContent(current, row, col);
-            	
+            	gv_visitedNodes = gv_visitedNodes +1;
                 if (content == EMPTY) {
                 	lv_up     = countSpaces(current, row, col, MOVE_UP,   NULL_COL);
                 	lv_down   = countSpaces(current, row, col, MOVE_DOWN, NULL_COL);
@@ -247,9 +248,6 @@ public class BFS {
     	else
     		currentState = current + LINE_BREAK;
 
-    	
-        //System.out.println("EXPAND :" + c);
-
         try(FileWriter fw = new FileWriter(gv_src, true);
     		    BufferedWriter bw = new BufferedWriter(fw);
     		    PrintWriter out = new PrintWriter(bw)){
@@ -260,7 +258,6 @@ public class BFS {
     		} catch (IOException e) {
     		    //exception handling left as an exercise for the reader
     		}
-        //c++;
     }
     
     // trace recursion
@@ -282,7 +279,7 @@ public class BFS {
     			currentState += LINE_BREAK;
     	}
     	
-    	System.out.println("STEP: " + step); 
+    	//System.out.println("STEP: " + step); 
         System.out.println(currentState);
        
         return step;

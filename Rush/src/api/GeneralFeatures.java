@@ -4,6 +4,8 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+
 import api.AStar.Puzzle;
 
 public class GeneralFeatures {
@@ -78,6 +80,4 @@ public class GeneralFeatures {
 		else
 			return text;
 	}
-    
-
 }

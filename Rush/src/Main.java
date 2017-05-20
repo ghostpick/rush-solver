@@ -8,48 +8,47 @@ import api.AStar.*;
 import api.AStar.Heuristics.*;
 
 public class Main  {
-	static ArrayList<String> lv_bfs_statistics = new ArrayList<String>();
 
     public static void main(String[] args){	
-
-
-    	String map = "------" +
-			         "-222A-" +
-			         ">>-BA-" +
-			         "---B--" +
-			         "---B--" +
-			         "------";
-    	
-    	BFS bfs_solver    = new BFS(map,6,6, true);
-    	lv_bfs_statistics = bfs_solver.applyAlgorithm();
-    	
-    	astar_solver_applyAlgorithm();
+    	applyAlgorithms();
 	}
     
-    
-    
-    static void astar_solver_applyAlgorithm(){
-    	Puzzle[] puzzles = null;
+    static void applyAlgorithms(){
+    	Puzzle[] puzzles 					= null;
+		String[] heuristic_names 			= null;
+		int num_puzzles 					= 0;
+		int num_heuristics 					= 0;
+		int[][] num_expanded 				= null;
+		int[][] steps 						= null;
+		long[][] duration 					= null;
+		ArrayList<String> arr_bfsMaps 		= new ArrayList<String> ();
+		ArrayList<String> lv_bfs_statistics = new ArrayList<String>();
+
     	try {
-    		puzzles = Puzzle.readPuzzlesFromFile(Global.SRC_MAPS);
+    		puzzles   = Puzzle.readPuzzlesFromFile(Global.SRC_MAPS);
     	} 
-    	catch (IOException e) {
-    		e.printStackTrace();
-    	}
+    	catch (IOException e) { e.printStackTrace(); }
     	
-    		String[] heuristic_names = null;
-    		int num_puzzles = puzzles.length; // puzzles.length;
-    		int num_heuristics = 0;
-
-    		int[][] num_expanded = null;
-    		int[][] steps = null;
-    		long[][] duration = null;
-
+    	num_puzzles = puzzles.length; 
+    	arr_bfsMaps = Puzzle.get_arr_bfsMaps();
+    	
+    	
     		// run each heuristic on each puzzle
-    		for (int i = 0; i < num_puzzles; i++) {
+    		for (int i = 0; i < num_puzzles; i++) { 			
     			System.out.println(Global.PRINT_RESULT_TBL_04);
-    			System.out.println(Global.PRINT_PUZZLE + puzzles[i].getName());
+    			System.out.println(Global.PRINT_PUZZLE + puzzles[i].getName());		
     			
+// BFS
+    			System.out.println(Global.PRINT_RESULT_TBL_04);
+    			System.out.println(Global.PRINT_BFS);
+    			
+    	    	BFS bfs_solver    = new BFS(arr_bfsMaps.get(i),
+    	    							    puzzles[i].getGridSize(),
+    	    							    puzzles[i].getGridSize(),
+    	    							    true);
+    	    	lv_bfs_statistics = bfs_solver.applyAlgorithm();
+
+// A*        			
     			// h(x) used in A*
     			Heuristic[] heuristics = {
     					new DFS(puzzles[i]),
@@ -59,14 +58,21 @@ public class Main  {
 
     			if (i == 0) {
     				num_heuristics  = heuristics.length;
-    				num_expanded    = new int[num_puzzles][num_heuristics];
-    				steps           = new int[num_puzzles][num_heuristics];
-    				duration        = new long[num_puzzles][num_heuristics];
-    				heuristic_names = new String[num_heuristics];
+    				num_expanded    = new int[num_puzzles][num_heuristics+1];
+    				steps           = new int[num_puzzles][num_heuristics+1];
+    				duration        = new long[num_puzzles][num_heuristics+1];
+    				heuristic_names = new String[num_heuristics+1];
     				
-    				for (int h = 0; h < num_heuristics; h++)
+    				for (int h = 1; h < num_heuristics; h++)
     					heuristic_names[h] = heuristics[h].getHeuristicName();
     			}
+    			
+    			num_expanded[i][num_heuristics]   = Integer.parseInt(lv_bfs_statistics.get(2));
+				steps[i][num_heuristics]          = Integer.parseInt(lv_bfs_statistics.get(0));
+				duration[i][num_heuristics]       = Long.parseLong(lv_bfs_statistics.get(1));
+				heuristic_names[num_heuristics]   = "BFS";
+    			
+    			
 
     			for (int h = 0; h < num_heuristics; h++) {
     			
@@ -103,7 +109,7 @@ public class Main  {
     		}
     		
     		GeneralFeatures generalFeatures = new GeneralFeatures();
-    		generalFeatures.log_tableResults(num_heuristics,
+    		generalFeatures.log_tableResults(num_heuristics+1,
     										 heuristic_names, 
     										 num_puzzles,
     										 steps, 
