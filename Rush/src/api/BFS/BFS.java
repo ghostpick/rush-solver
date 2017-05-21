@@ -82,7 +82,7 @@ public class BFS {
                 	System.out.println(
                 			Global.PRINT_STEPS_01     + lv_steps     + Global.PRINT_SEPARATOR +
                 			Global.PRINT_DURATION_01  + lv_totalTime + Global.PRINT_SEPARATOR +
-							Global.PRINT_EXPNODES_01  + this.gt_stateMap.size());	
+							Global.PRINT_EXPNODES_01  + gv_visitedNodes);	
                 	
                 	rt_statistics.add(Integer.toString(lv_steps));
                 	rt_statistics.add(Long.toString(lv_totalTime));

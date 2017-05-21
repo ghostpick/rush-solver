@@ -74,7 +74,6 @@ public class AStar {
     				open.add(hSuccessor);
     			}
     		}
-
     	}
 
     }

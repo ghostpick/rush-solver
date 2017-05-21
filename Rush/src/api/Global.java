@@ -19,14 +19,14 @@ public abstract class Global {
     public final static String PRINT_STEPS_01    	= " >> Steps: ";
     public final static String PRINT_SEPARATOR    	= ", ";
     public final static String PRINT_HEURISTIC   	= " >> Heuristic: ";
-    public final static String PRINT_BFS   			= " >> BFS";
+    public final static String PRINT_BFS   			= " >> BFS(optimized)";
     public final static String PRINT_PUZZLE     	= "\n  PUZZLE: ";
     
 
     public final static String PRINT_RESULT_TBL_00 	= " > RESULTS:\n";
     		
     public final static String PRINT_RESULT_TBL_01 	= 
-    "|            | A* (only g(n)) >> DFS |A* - BLOCKING HEURISTIC|A* - ADVANCED HEURISTIC|          BFS          |";
+    "|            |     A* (only g(n))    |A* - BLOCKING HEURISTIC|A* - ADVANCED HEURISTIC|   BFS(not optimized)  |";
     
     public final static String PRINT_RESULT_TBL_02 	= 
     "| Name       |   steps   dur.  nodes |   steps   dur.  nodes |   steps   dur.  nodes |   steps   dur.  nodes |";

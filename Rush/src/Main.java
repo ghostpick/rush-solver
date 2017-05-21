@@ -1,6 +1,5 @@
 import java.io.IOException;
 import java.util.ArrayList;
-
 import api.GeneralFeatures;
 import api.Global;
 import api.BFS.*;
@@ -51,9 +50,9 @@ public class Main  {
 // A*        			
     			// h(x) used in A*
     			Heuristic[] heuristics = {
-    					new DFS(puzzles[i]),
-    					new BlockingHeuristic(puzzles[i]),
-    					new AdvancedHeuristic(puzzles[i])
+    					new Simple_H(puzzles[i]),
+    					new Block_H(puzzles[i]),
+    					new Advance_H(puzzles[i])
     				};
 
     			if (i == 0) {
@@ -63,7 +62,7 @@ public class Main  {
     				duration        = new long[num_puzzles][num_heuristics+1];
     				heuristic_names = new String[num_heuristics+1];
     				
-    				for (int h = 1; h < num_heuristics; h++)
+    				for (int h = 0; h < num_heuristics; h++)
     					heuristic_names[h] = heuristics[h].getHeuristicName();
     			}
     			
