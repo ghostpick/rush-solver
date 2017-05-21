@@ -22,6 +22,9 @@ public class Main  {
 		long[][] duration 					= null;
 		ArrayList<String> arr_bfsMaps 		= new ArrayList<String> ();
 		ArrayList<String> lv_bfs_statistics = new ArrayList<String>();
+		String line							= "";
+	    GeneralFeatures go_gf		= new GeneralFeatures();
+
 
     	try {
     		puzzles   = Puzzle.readPuzzlesFromFile(Global.SRC_MAPS);
@@ -33,13 +36,25 @@ public class Main  {
     	
     	
     		// run each heuristic on each puzzle
-    		for (int i = 0; i < num_puzzles; i++) { 			
+    		for (int i = 0; i < num_puzzles; i++) {
+    			line = "";
     			System.out.println(Global.PRINT_RESULT_TBL_04);
     			System.out.println(Global.PRINT_PUZZLE + puzzles[i].getName());		
     			
 // BFS
     			System.out.println(Global.PRINT_RESULT_TBL_04);
     			System.out.println(Global.PRINT_BFS);
+    			
+    			line = Global.PRINT_RESULT_TBL_04 + 
+    				   Global.PRINT_PUZZLE + puzzles[i].getName() + 
+    				   Global.PRINT_RESULT_TBL_04 +  
+    				   Global.LINE_BREAK + 
+    				   Global.PRINT_BFS;
+    			
+    			
+    			go_gf.log(line, false);
+    			
+    			
     			
     	    	BFS bfs_solver    = new BFS(arr_bfsMaps.get(i),
     	    							    puzzles[i].getGridSize(),
@@ -77,6 +92,12 @@ public class Main  {
     			
     				System.out.println(Global.PRINT_RESULT_TBL_05);
     				System.out.println(Global.PRINT_HEURISTIC + heuristic_names[h] + Global.LINE_BREAK);
+    				line = Global.PRINT_RESULT_TBL_05 + 
+    					   Global.LINE_BREAK +
+    					   Global.PRINT_HEURISTIC + 
+    					   heuristic_names[h] + Global.LINE_BREAK;
+    				
+    				go_gf.log(line, true);
 
     				puzzles[i].resetSearchCount();
     				
@@ -98,11 +119,13 @@ public class Main  {
     					num_expanded[i][h] = puzzles[i].getSearchCount();
     					steps[i][h] = search.path.length - 1;
     					duration[i][h] = endTime - startTime;
-
-    					System.out.println(Global.PRINT_STEPS_01    + steps[i][h]    + Global.PRINT_SEPARATOR +
-    									   Global.PRINT_DURATION_01 + duration[i][h] + Global.PRINT_SEPARATOR  +
-    									   Global.PRINT_EXPNODES_01 + num_expanded[i][h] );
-
+    					
+    					line =     Global.PRINT_STEPS_01    + steps[i][h]    + Global.PRINT_SEPARATOR +
+								   Global.PRINT_DURATION_01 + duration[i][h] + Global.PRINT_SEPARATOR  +
+								   Global.PRINT_EXPNODES_01 + num_expanded[i][h];
+    					
+    					System.out.println(line);
+         				go_gf.log(line, true);
     				}
     			}
     		}

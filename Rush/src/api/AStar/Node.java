@@ -34,20 +34,11 @@ public class Node {
 		this.parent = parent;
 	}
 
-	/** Returns the state associated with this node. */
-	public State getState() {
-		return state;
-	}
+	public State getState() {return state;  }
 
-	/** Returns this node's parent node. */
-	public Node getParent() {
-		return parent;
-	}
+	public Node getParent() {return parent; }
 
-	/** Returns the depth of this node. */
-	public int getDepth() {
-		return depth;
-	}
+	public int getDepth()   {return depth;  }
 
 	/**
 	 * Expands this node, in other words, computes all of the nodes immediately

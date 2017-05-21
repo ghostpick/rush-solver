@@ -16,18 +16,12 @@ import api.AStar.Heuristics.Heuristic;
  */
 public class AStar {
 
-    /** The solution path is stored here */
-    public State[] path;
-    
-    private SortableList<HNode> open = new SortableList<HNode>();
-    private List<HNode> closed = new ArrayList<HNode>();
+    public State[] 				path; // puzzle solution   
+    private SortableList<HNode> open 	= new SortableList<HNode>();
+    private List<HNode> 		closed 	= new ArrayList<HNode>();
 
-    /**
-     * This is the constructor that performs A* search to compute a
-     * solution for the given puzzle using the given heuristic.
-     */
+    // A* search, using  heuristic.
     public AStar(Puzzle puzzle, Heuristic heuristic) {
-    	
     	// Initialize root node w/ heuristics and path costs
     	int h = heuristic.getValue(puzzle.getInitNode().getState());
     	HNode root = new HNode(puzzle.getInitNode(), h);
@@ -35,7 +29,6 @@ public class AStar {
     	open.add(root);	// Add the root node to the open list
     	
     	while(!open.isEmpty()) {
-    		
     		// Only performs sort if list was changed
     		open.sort();
     		
@@ -57,7 +50,7 @@ public class AStar {
     				pathNode = pathNode.getParent();
     			}
     			
-    			// We found a solution, stop.
+    			// solution found
     			return;
     		}
     		

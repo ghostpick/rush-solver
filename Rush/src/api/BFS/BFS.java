@@ -1,16 +1,11 @@
 package api.BFS;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.*;
-
+import api.GeneralFeatures;
 import api.Global;
 
 public class BFS {
 
-    // static parameters
     final int 						POSITION_INITIAL	= 2;
     final int 						POSITION_GOAL 		= 5;
     final char 						MY_CAR 				= '>';
@@ -20,7 +15,6 @@ public class BFS {
     final String 					CAR_SMALL 			= "1A" + MY_CAR;  // length 2 cars
     final char						EMPTY 				= '-';    		  // empty space, movable into
     final char 						OUT_OF_BOUND		= 'X';    		  // represents everything out of bound
-    final String 					LINE_BREAK 			= "\n";
   
     final int 						MOVE_UP				= -1;
     final int 						MOVE_DOWN			=  1;
@@ -30,16 +24,16 @@ public class BFS {
     final int 						NULL_ROW		    =  0;
     final int 						NULL_COL		    =  0;
     
-    // Variables
+    static int c 										=  0;
+    
 	private int 					gv_boardRows		= 0;
 	private int 					gv_boarColumns 		= 0;
     private String					gv_initialMap 		= "";
     private HashMap<String,String>	gt_stateMap			= null; // <currentState,previousState> 
     private Queue<String> 			gv_queue 			= null; // the breadth first search queue
     private boolean 				gv_trace 			= false;
-    private String 					gv_src				= "files/results/bfs_solver.txt";
     private int					    gv_visitedNodes		= 0;
-
+    private GeneralFeatures 		go_gf				= new GeneralFeatures();
     
     /////////////////////////////////////////////////////////////////////////////// PUBLIC SECTION
     public BFS(String map, int lines,int columns, boolean trace){
@@ -58,17 +52,18 @@ public class BFS {
     
     // solve rush problem
     public ArrayList<String> applyAlgorithm(){
-    	String lv_currentSate = "";
-    	char   lv_content     = ' ';
-    	int    lv_steps       = 0;
-    	long   lv_startTime   = System.currentTimeMillis();
-    	ArrayList<String> rt_statistics = new ArrayList<String>();
+    	String lv_currentSate 			= "";
+    	char   lv_content     			= ' ';
+    	int    lv_steps       			= 0;
+    	long   lv_startTime   			= System.currentTimeMillis();
+    	String lv_printLine 			= "";
 
+    	ArrayList<String> rt_statistics = new ArrayList<String>();
     	
+
         while (!this.gv_queue.isEmpty()) {
         	lv_currentSate = this.gv_queue.remove();
         	lv_content 	   = this.getContent(lv_currentSate, POSITION_INITIAL, POSITION_GOAL);
-        	
         	
         	// GOAL
         	if (lv_content == MY_CAR){      	
@@ -77,12 +72,12 @@ public class BFS {
             		long lv_endTime   = System.currentTimeMillis();
             		long lv_totalTime = lv_endTime - lv_startTime;
             		lv_steps          = this.printSteps(lv_currentSate);
-            	
+            		lv_printLine      = Global.PRINT_STEPS_01     + lv_steps     + Global.PRINT_SEPARATOR +
+                					    Global.PRINT_DURATION_01  + lv_totalTime + Global.PRINT_SEPARATOR +
+                					    Global.PRINT_EXPNODES_01  + gv_visitedNodes;
             		
-                	System.out.println(
-                			Global.PRINT_STEPS_01     + lv_steps     + Global.PRINT_SEPARATOR +
-                			Global.PRINT_DURATION_01  + lv_totalTime + Global.PRINT_SEPARATOR +
-							Global.PRINT_EXPNODES_01  + gv_visitedNodes);	
+                	System.out.println(lv_printLine);	
+                	go_gf.log(lv_printLine, true);
                 	
                 	rt_statistics.add(Integer.toString(lv_steps));
                 	rt_statistics.add(Long.toString(lv_totalTime));
@@ -101,40 +96,22 @@ public class BFS {
         
     /////////////////////////////////////////////////////////////////////////////// PRIVATE SECTION
 
-    // using BFS if we haven't reached the objective
     // Map the given state and add to queue
     private void saveState(String nextState, String prevState) {
         if (!this.gt_stateMap.containsKey(nextState)) {
         	this.gt_stateMap.put(nextState, prevState);
             this.gv_queue.add(nextState);
-            log(nextState, true);
+            //go_gf.log_steps(nextState, true, this.gv_boardRows);
         }
-
     }
-
     
-    // expands a given state; searches for next level states in the breadth first search
-    //
-    // Let (row,col) be the intersection point of this cross:
-    //
-    //     X       lv_up    = 3     'X' is not a car, 'A' and '>' are of the wrong type;
-    //     -       lv_down  = 1     only '1' can slide to the right up to 5 spaces
-    //   1-----A   lv_left  = 2
-    //     >       lv_right = 4
-    //
-    // The n? counts how many spaces are there in a given direction, origin inclusive.
-    // Cars matching the type will then slide on these "alleys".
-
-    static int c = 0;
+    // Expands a given state; searches for next level states in the breadth first search
     
     private void expand(String current) {
     	int  lv_up, lv_down, lv_left, lv_right,lv_maxHorizontalMove, lv_maxVerticalMove = 0;
     	char content = ' ';
-    	
-        log(Integer.toString(c), false);
-//        log(current, true);
+    	//go_gf.log_steps(Integer.toString(c), false, this.gv_boardRows);
 
-    	
         for (int row = 0; row < this.gv_boardRows; row++) {
             for (int col = 0; col < this.gv_boarColumns; col++) {
             	content = getContent(current, row, col);
@@ -152,16 +129,13 @@ public class BFS {
                 	move(current, row, col, V_CAR, lv_down,  MOVE_DOWN,  NULL_COL,   lv_maxVerticalMove);
                 	move(current, row, col, H_CAR, lv_left,  NULL_ROW,   MOVE_LEFT,  lv_maxHorizontalMove);
                 	move(current, row, col, H_CAR, lv_right, NULL_ROW,   MOVE_RIGHT, lv_maxHorizontalMove);
-                	
                 }
             }
         }
         c++;
-
     }
-    
-    // in a given state, starting from given coordinate, toward the given direction,
-    // counts how many empty spaces there are (origin inclusive)
+   
+    // counts how many empty spaces there are
     private int countSpaces(String state, int row, int col, int dr, int dc) {
         int k  		 = 0;
         char content = getContent(state, row + k * dr, col + k * dc);
@@ -173,27 +147,17 @@ public class BFS {
         return k;
     }
     
-    // in a given state, from a given origin coordinate, attempts to find a car of a given type
-    // at a given distance in a given direction; if found, slide it in the opposite direction
-    // one spot at a time, exactly n times, proposing those states to the breadth first search
-    //
-    // e.g.
-    //    direction = -->
-    //    __n__
-    //   /     \
-    //   ..o....c
-    //      \___/
-    //      distance
-    //
-    private void move(String current, int row, int col, String type, int numberSpaces, int distRow, int distCol, int n) {
+    // BFS move
+    private void move(String current, int row, int col, String type, int numberSpaces, 
+    				  int distRow, int distCol, int n) {
+    	
     	row += numberSpaces * distRow;
     	col += numberSpaces * distCol;
         char content = getContent(current, row, col);
         
         if ((type.indexOf(content) == -1))
         	return;
-        
-        
+             
         final int L = getLengthCar(content);
         StringBuilder sb = new StringBuilder(current);
         for (int i = 0; i < n; i++) {
@@ -202,7 +166,6 @@ public class BFS {
             sb.setCharAt(matrixToString(row, col), content);
             sb.setCharAt(matrixToString(row + L * distRow, col + L * distCol), EMPTY);
             saveState(sb.toString(), current);
-            //current = sb.toString(); // step-step
         }
     }
         
@@ -232,39 +195,11 @@ public class BFS {
     }
     
     
-    //log
-    private void log(String current, boolean state){
-    	String currentState = LINE_BREAK;
-
-    	if (state){
-	        
-	    	for(int i = 0; i < current.length(); i++){
-	    		currentState += current.charAt(i);
-	    		
-	    		if ((i+1)%this.gv_boardRows == 0)
-	    			currentState += LINE_BREAK;
-	    	}
-    	}
-    	else
-    		currentState = current + LINE_BREAK;
-
-        try(FileWriter fw = new FileWriter(gv_src, true);
-    		    BufferedWriter bw = new BufferedWriter(fw);
-    		    PrintWriter out = new PrintWriter(bw)){
-    	   
-    		    //more code
-    		    out.println(currentState);
-    		    //more code
-    		} catch (IOException e) {
-    		    //exception handling left as an exercise for the reader
-    		}
-    }
-    
     // trace recursion
     private int printSteps(String current) {
         String prev = this.gt_stateMap.get(current);
         int    step = 0;
-    	String currentState = LINE_BREAK;
+    	String currentState = Global.LINE_BREAK;
 
         // get step
         if(prev == null)
@@ -276,11 +211,12 @@ public class BFS {
     		currentState += current.charAt(i);
     		
     		if ((i+1)%this.gv_boardRows == 0)
-    			currentState += LINE_BREAK;
+    			currentState += Global.LINE_BREAK;
     	}
     	
     	//System.out.println("STEP: " + step); 
         System.out.println(currentState);
+        go_gf.log(currentState,true);
        
         return step;
     }

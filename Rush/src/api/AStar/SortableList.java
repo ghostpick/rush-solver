@@ -14,21 +14,15 @@ public class SortableList<T extends Comparable> {
 		this.list.add(element);
 	}
 	
+	public int indexOf(T element) 	{return this.list.indexOf(element);}
 	
-	public int indexOf(T element) {
-		return this.list.indexOf(element);
-	}
-	
-	public T get(int index) {
-		return this.list.get(index);
-	}
+	public T get(int index) 		{return this.list.get(index);      }
 	
 	public T get(T element) {
 		int index = this.list.indexOf(element);
 		
-		if (index == -1) {
+		if (index == -1) 
 			return null;
-		}
 		
 		return this.list.get(index);
 	}
@@ -36,20 +30,17 @@ public class SortableList<T extends Comparable> {
 	public T remove(int index) {
 		T removed = this.list.remove(index);
 		
-		if (removed != null) {
+		if (removed != null) 
 			this.needsSorting = true;
-		}
-		
-		return removed;
-		
+
+		return removed;	
 	}
 	
 	public boolean remove(T element) {
 		boolean removed = this.list.remove(element);
 		
-		if (removed == true) {
+		if (removed == true) 
 			this.needsSorting = true;
-		}
 		
 		return removed;
 	}
@@ -59,21 +50,13 @@ public class SortableList<T extends Comparable> {
 		this.needsSorting = false;
 	}
 	
-	public boolean contains(T element) {
-		return this.list.contains(element);
-	}
+	public boolean contains(T element) 	{ return this.list.contains(element); }
 	
-	public int size() {
-		return this.list.size();
-	}
+	public int size() 					{return this.list.size();    }
 	
-	public boolean isEmpty() {
-		return this.list.isEmpty();
-	}
+	public boolean isEmpty() 			{return this.list.isEmpty(); }
 	
-	public boolean needsSorting() {
-		return this.needsSorting;
-	}
+	public boolean needsSorting() 		{return this.needsSorting;   }
 	
 	@SuppressWarnings("unchecked")
 	public void sort() {

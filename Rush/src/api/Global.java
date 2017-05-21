@@ -10,7 +10,8 @@ public abstract class Global {
 	public final static char BFS_V3	   		  		= 'B';
 	
     public final static String SRC_MAPS		    	= "files/puzzle.txt";
-    public final static String SRC_BFS		    	= "files/results/bfs_solver.txt";
+    public final static String SRC_BFS		    	= "files/results/bfs_trace.txt";
+    public final static String SRC_LOG		    	= "files/results/solver_trace.txt";
     public final static String PRINT_DURATION		= "Duration";
     public final static String PRINT_DURATION_01	= "Duration: ";
     public final static String PRINT_EXPNODES		= "Nodes exapanded";
@@ -19,7 +20,7 @@ public abstract class Global {
     public final static String PRINT_STEPS_01    	= " >> Steps: ";
     public final static String PRINT_SEPARATOR    	= ", ";
     public final static String PRINT_HEURISTIC   	= " >> Heuristic: ";
-    public final static String PRINT_BFS   			= " >> BFS(optimized)";
+    public final static String PRINT_BFS   			= " >> BFS(not optimized)";
     public final static String PRINT_PUZZLE     	= "\n  PUZZLE: ";
     
 

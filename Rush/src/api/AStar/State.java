@@ -2,6 +2,8 @@ package api.AStar;
 
 import java.util.*;
 
+import api.GeneralFeatures;
+
 /**
  * This is the class for representing a single state of the rush hour puzzle.
  * Methods are provided for constructing a state, for accessing information
@@ -29,6 +31,8 @@ public class State {
 
 	private Puzzle puzzle;
 	private int varPos[];
+    private GeneralFeatures go_gf = new GeneralFeatures();
+
 
 	/**
 	 * The main constructor for constructing a state. You probably will never
@@ -66,38 +70,59 @@ public class State {
 	public void print() {
 		int grid[][] = getGrid();
 		int gridsize = puzzle.getGridSize();
+		String line  = "";
 
 		System.out.print("+-");
+		line = "+-";
 		for (int x = 0; x < gridsize; x++) {
 			System.out.print("--");
+			line = line + "--";
 		}
 		System.out.println("+");
+		line = line + "+" + "\n";
 
 		for (int y = 0; y < gridsize; y++) {
 			System.out.print("| ");
+			line = line + "| ";
 			for (int x = 0; x < gridsize; x++) {
 				int v = grid[x][y];
 				if (v < 0) {
 					System.out.print(". ");
+					line = line + ". ";
 				} else {
 					int size = puzzle.getCarSize(v);
 					if (puzzle.getCarOrient(v)) {
 						System.out.print((y == varPos[v] ? "^ " : ((y == varPos[v] + size - 1) ? "v " : "| ")));
+						line = line + (y == varPos[v] ? "^ " : ((y == varPos[v] + size - 1) ? "v " : "| "));
+						
+						
 					} else {
 						System.out.print(x == varPos[v] ? "< " : ((x == varPos[v] + size - 1) ? "> " : "- "));
+						line = line + (x == varPos[v] ? "< " : ((x == varPos[v] + size - 1) ? "> " : "- "));
+
 					}
 				}
 			}
 			System.out.println(
 					(puzzle.getCarOrient(0) || y != puzzle.getFixedPosition(0)) ? "|" : (isGoal() ? ">" : " "));
+			line = line + ((puzzle.getCarOrient(0) || y != puzzle.getFixedPosition(0)) ? "|" : (isGoal() ? ">" : " "));
+			go_gf.log(line, false);
+			line = "";
+			
+			
 		}
 
 		System.out.print("+-");
+		line = line + "+-";
 		for (int x = 0; x < gridsize; x++) {
 			System.out.print(
 					(!puzzle.getCarOrient(0) || x != puzzle.getFixedPosition(0)) ? "--" : (isGoal() ? "v-" : " -"));
+			
+			line = line + ((!puzzle.getCarOrient(0) || x != puzzle.getFixedPosition(0)) ? "--" : (isGoal() ? "v-" : " -"));
 		}
 		System.out.println("+");
+		
+		go_gf.log(line + "+", false);
 
 	}
 
@@ -148,7 +173,7 @@ public class State {
 		int grid[][] = getGrid();
 		int num_cars = puzzle.getNumCars();
 
-		ArrayList new_states = new ArrayList();
+		ArrayList<State> new_states = new ArrayList<State>();
 
 		for (int v = 0; v < num_cars; v++) {
 			int p = varPos[v];

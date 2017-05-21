@@ -2,28 +2,8 @@ package api.AStar;
 
 import java.io.*;
 import java.util.*;
-
-import com.sun.org.apache.bcel.internal.generic.BREAKPOINT;
-
 import api.Global;
 
-/**
- * This is the class for representing a particular rush hour puzzle. Methods are
- * provided for accessing information about a puzzle, and also for reading in a
- * list of puzzles from a data file. In addition, this class maintains a counter
- * of the number of search nodes that have been expanded for this puzzle.
- * Methods for accessing, incrementing or resetting this counter are also
- * provided.
- * <p>
- * Every car is constrained to only move horizontally or vertically. Therefore,
- * each car has one dimension along which it is fixed, and another dimension
- * along which it can be moved. The fixed dimension is stored here as part of
- * the puzzle. Also stored here are the sizes and orientations of the cars, the
- * size of the puzzle grid, the name of the puzzle and the initial (root) search
- * node of the puzzle.
- * <p>
- * The goal car is always assigned index 0.
- */
 public class Puzzle {
 
 	private String name;
@@ -36,97 +16,37 @@ public class Puzzle {
 	private int gridSize;
 	private static ArrayList<String> arr_bfsMaps = new ArrayList<String> ();
 	
-	public static ArrayList<String> get_arr_bfsMaps() {
-		return arr_bfsMaps;
-	}
+	public static ArrayList<String> get_arr_bfsMaps() 	{ return arr_bfsMaps;  }
 	
-	/** Returns the number of cars for this puzzle. */
-	public int getNumCars() {
-		return numCars;
-	}
+	public int getNumCars() 							{ return numCars;      }
 
-	/** Returns the fixed position of car <tt>v</tt>. */
-	public int getFixedPosition(int v) {
-		return fixedPos[v];
-	}
+	public int getFixedPosition(int v)					{ return fixedPos[v];  }
 
-	/** Returns the size (length) of car <tt>v</tt>. */
-	public int getCarSize(int v) {
-		return carSize[v];
-	}
+	public int getCarSize(int v) 						{ return carSize[v];   }
 
-	/**
-	 * Returns the orientation of car <tt>v</tt>, where <tt>true</tt> means that
-	 * the car is vertically oriented.
-	 */
-	public boolean getCarOrient(int v) {
-		return carOrient[v];
-	}
+	public boolean getCarOrient(int v) 					{ return carOrient[v]; }
 
-	/** Increments the search counter by <tt>d</tt>. */
-	public void incrementSearchCount(int d) {
-		searchCount += d;
-	}
+	public void incrementSearchCount(int d) 			{ searchCount += d;    }
 
-	/**
-	 * Returns the current value of the search counter, which keeps a count of
-	 * the number of nodes generated on the current search.
-	 */
-	public int getSearchCount() {
-		return searchCount;
-	}
+	public int getSearchCount() 						{ return searchCount;  }
+	
+	public void resetSearchCount() 						{ searchCount = 1;     }
 
-	/** Resets the search counter to 1 (for the initial node). */
-	public void resetSearchCount() {
-		searchCount = 1;
-	}
+	public String getName() 							{ return name;		   }
 
-	/** Returns the name of this puzzle. */
-	public String getName() {
-		return name;
-	}
+	public int getGridSize() 							{ return gridSize;     }
 
-	/**
-	 * Returns the grid size of this puzzle, i.e., the length along each side.
-	 */
-	public int getGridSize() {
-		return gridSize;
-	}
+	public Node getInitNode() 							{ return initNode;     }
 
-	/** Returns the initial (root) node of this puzzle. */
-	public Node getInitNode() {
-		return initNode;
-	}
 
-	/**
-	 * The main constructor for constructing a puzzle. You probably will never
-	 * need to use this constructor directly, since ordinarily puzzles will be
-	 * constructed by reading them in from a datafile using the
-	 * <tt>readPuzzlesFromFile</tt> method. It is assumed that the goal car is
-	 * always assigned index 0.
-	 *
-	 * @param name
-	 *            the name of the puzzle
-	 * @param gridSize
-	 *            the size of one side of the puzzle grid
-	 * @param numCars
-	 *            the number of cars on this puzzle
-	 * @param orient
-	 *            the orientations of each car (<tt>true</tt> = vertical)
-	 * @param size
-	 *            the sizes of each car
-	 * @param x
-	 *            the x-coordinates of each car
-	 * @param y
-	 *            the y-coordinates of each car
-	 */
 	public Puzzle(String name, int gridSize, int numCars, boolean orient[], int size[], int x[], int y[]) {
-		this.name = name;
-		this.numCars = numCars;
-		this.gridSize = gridSize;
-		if (numCars <= 0) {
-			throw new IllegalArgumentException("Each puzzle must have a positive number of cars");
-		}
+		this.name 		= name;
+		this.numCars 	= numCars;
+		this.gridSize	= gridSize;
+		
+		// Check positive number of cars
+		if (numCars <= 0) { System.exit(0); }
+		
 		carOrient = new boolean[numCars];
 		carSize = new int[numCars];
 		fixedPos = new int[numCars];
@@ -137,12 +57,15 @@ public class Puzzle {
 		for (int v = 0; v < numCars; v++) {
 			carOrient[v] = orient[v];
 			carSize[v] = size[v];
+			
+			// Check positive number of cars
 			if (size[v] <= 0)
-				throw new IllegalArgumentException("Cars must have positive size");
-
+				 System.exit(0);
+			
+			// Check cars in the of grid"
 			if (x[v] < 0 || y[v] < 0 || (orient[v] && y[v] + size[v] > gridSize)
 					|| (!orient[v] && x[v] + size[v] > gridSize))
-				throw new IllegalArgumentException("Cars must be within bounds of grid");
+				System.exit(0);
 
 			for (int d = 0; d < size[v]; d++) {
 				int xv = x[v], yv = y[v];
@@ -150,8 +73,11 @@ public class Puzzle {
 					yv += d;
 				else
 					xv += d;
+				
+				// check overlap cars
 				if (grid[xv][yv])
-					throw new IllegalArgumentException("Cars cannot overlap");
+					 System.exit(0);
+				
 				grid[xv][yv] = true;
 			}
 
@@ -162,62 +88,51 @@ public class Puzzle {
 				fixedPos[v] = y[v];
 				varPos[v] = x[v];
 			}
-
 		}
-
 		initNode = new Node(new State(this, varPos), 0, null);
-
 		resetSearchCount();
 	}
 
-	/**
-	 * A static method for reading in a list of puzzles from the data file
-	 * called <tt>filename</tt>. Each puzzle is described in the data file using
-	 * the format described on the assignment. The set of puzzles is returned as
-	 * an array of <tt>Puzzle</tt>'s.
-	 */
+	// Puzzle reader
 	public static Puzzle[] readPuzzlesFromFile(String filename) throws FileNotFoundException, IOException {
 
-		BufferedReader in = new BufferedReader(new FileReader(filename));
-
-		ArrayList puzzles = new ArrayList();
-		ArrayList car_list = null;
-
-		String name = null;
-		String line;
-		String[] words = null;
-
-		int read_mode = 0;
-		int line_count = 0;
-		int gridsize = 0;
+		@SuppressWarnings("resource")
+		BufferedReader in 			 = new BufferedReader(new FileReader(filename));
+		ArrayList<Puzzle> puzzles  	 = new ArrayList<Puzzle> ();
+		ArrayList<Obstacle> car_list = null;
+		String name 				 = null;
+		String line					 = "";
+		String[] words 				 = null;
+		int read_mode 				 = 0;
+		int gridsize 				 = 0;
 
 		while ((line = in.readLine()) != null) {
-			line_count++;
-			line = line.trim();
+			line  = line.trim();
 			words = line.split("\\s+");
+			
 			if (line.equals(""))
 				continue;
-
-			if (read_mode == 0) { // reading name
+			
+			// name
+			if (read_mode == 0) { 
 				name = line;
-				car_list = new ArrayList();
+				car_list = new ArrayList<Obstacle>();
 				read_mode = 1;
-			} else if (read_mode == 1) { // reading grid size
-				if (words.length != 1)
-					throw new RuntimeException(
-							"Expected single integer for grid size at line " + line_count + " in file " + filename);
+				
+			}
+			
+			// grid size
+			else if (read_mode == 1) { 	
 				try {
 					gridsize = Integer.parseInt(words[0]);
-				} catch (NumberFormatException e) {
-					throw new NumberFormatException(
-							"Expected integer grid size at line " + line_count + " in file " + filename);
-				}
-				if (gridsize <= 0)
-					throw new RuntimeException(
-							"Expected positive grid size at line " + line_count + " in file " + filename);
-
+				} 
+		    	catch (Exception e) { e.printStackTrace(); }
 				read_mode = 2;
-			} else if (line.equals(".")) { // end of puzzle description
+
+			} 
+			
+			// end of puzzle
+			else if (line.equals(".")) { 
 				int numcars = car_list.size();
 				boolean orient[] = new boolean[numcars];
 				int size[] = new int[numcars];
@@ -225,154 +140,112 @@ public class Puzzle {
 				int y[] = new int[numcars];
 
 				for (int v = 0; v < numcars; v++) {
-					CarRec carrec = (CarRec) car_list.get(v);
+					Obstacle carrec = (Obstacle) car_list.get(v);
 					orient[v] = carrec.orient;
 					size[v] = carrec.size;
 					x[v] = carrec.x;
 					y[v] = carrec.y;
+					
 				}
 
 				puzzles.add(new Puzzle(name, gridsize, numcars, orient, size, x, y));
-				import_toBFS(gridsize, numcars, orient, size, x, y);
-				
-				
-				
-			    
-			   
+				import_toBFS(gridsize, numcars, orient, size, x, y);   
 				read_mode = 0;
-			} else {
-				CarRec carrec = new CarRec();
-
-				if (words.length != 4) {
-					throw new RuntimeException(
-							"Expected four arguments at line " + line_count + " in file " + filename);
-				}
+			
+			} 
+			
+			else {
+				Obstacle carrec = new Obstacle();
 
 				try {
-					carrec.x = Integer.parseInt(words[0]);
-				} catch (NumberFormatException e) {
-					throw new NumberFormatException(
-							"Expected integer x-coordinate at line " + line_count + " in file " + filename);
-				}
-
-				try {
-					carrec.y = Integer.parseInt(words[1]);
-				} catch (NumberFormatException e) {
-					throw new NumberFormatException(
-							"Expected integer y-coordinate at line " + line_count + " in file " + filename);
-				}
-
-				String o = words[2].toLowerCase();
-
-				if (!o.equals("v") && !o.equals("h")) {
-					throw new RuntimeException(
-							"Expected orientation to be 'v' or 'h' at line " + line_count + " in file " + filename);
-				}
-				carrec.orient = o.equals("v");
-
-				try {
-					carrec.size = Integer.parseInt(words[3]);
-				} catch (NumberFormatException e) {
-					throw new NumberFormatException(
-							"Expected integer car size at line " + line_count + " in file " + filename);
-				}
-
+					carrec.x 			= Integer.parseInt(words[0]);
+					carrec.y 			= Integer.parseInt(words[1]);
+					String orientation  = words[2].toLowerCase();
+					carrec.orient 		= orientation.equals("v");
+					carrec.size 		= Integer.parseInt(words[3]);
+				} 
+		    	catch (Exception e) { e.printStackTrace(); }
 				car_list.add(carrec);
 			}
 		}
-
-		if (read_mode != 0)
-			throw new RuntimeException("Puzzle description ended prematurely in file " + filename);
-
 		return (Puzzle[]) puzzles.toArray(new Puzzle[0]);
 	}
 
 	
 	public static void import_toBFS(int gridsize, int car_total, boolean car_orient[], int size[], int x[], int y[]){
 			
-		StringBuilder lv_map_builder = new StringBuilder();
+		StringBuilder	lv_map_builder	= new StringBuilder();
+		char[][] 		lv_arrMap		= new char [gridsize][gridsize];
+		int 			lv_interations 	= 0;
+		boolean 		lv_orient		= false;
+		int 			lv_x			= 0;
+		int 			lv_y			= 0;
+		int 			lv_carSize		= 0;
+		int 			lv_increment	= 0;;
+		char 			lv_val 			= '-';			
 		
-		char[][] darray = new char [gridsize][gridsize];
-		int interations = 0;
-		boolean l_orient;
-		int xx;
-		int yy;
-		int size_car;
-		int temp_inc = 0;;
-		char val = '-';			
-
-
-
-
-for(int a=0; a < gridsize; a++){
-			for(int b=0; b < gridsize; b++){
-				darray[a][b] = '-';
-			}
-		}
 		
+		for(int a=0; a < gridsize; a++)
+			for(int b=0; b < gridsize; b++)
+				lv_arrMap[a][b] = '-';
+						
 
-	    while(interations != car_total){
-	    	l_orient    =  car_orient[interations];
-	    	xx		    =  x[interations];
-	    	yy		    =  y[interations];
-	    	size_car    =  size[interations];
+	    while(lv_interations != car_total){
+	    	lv_orient   =  car_orient[lv_interations];
+	    	lv_x		=  x[lv_interations];
+	    	lv_y		=  y[lv_interations];
+	    	lv_carSize  =  size[lv_interations];
 	    	
-	    	if(interations == 0){
-	    		val = Global.BFS_MYCAR;
-	    		temp_inc =  xx;
+	    	if(lv_interations == 0){
+	    		lv_val = Global.BFS_MYCAR;
+	    		lv_increment =  lv_x;
 	    	}
-	    	else if (size_car == 2 && !l_orient){
-	    		val = Global.BFS_H2;
-	    		temp_inc =  xx;
+	    	else if (lv_carSize == 2 && !lv_orient){
+	    		lv_val = Global.BFS_H2;
+	    		lv_increment =  lv_x;
 	    	}
-	    	else if (size_car == 3 && !l_orient){
-	    		val = Global.BFS_H3;
-	    		temp_inc =  xx;	
+	    	else if (lv_carSize == 3 && !lv_orient){
+	    		lv_val = Global.BFS_H3;
+	    		lv_increment =  lv_x;	
 	    	}
-	    	else if (size_car == 2 && l_orient){
-	    		val = Global.BFS_V2;
-	    		temp_inc =  yy;
+	    	else if (lv_carSize == 2 && lv_orient){
+	    		lv_val = Global.BFS_V2;
+	    		lv_increment =  lv_y;
 	    	}
-	    	else if (size_car == 3 && l_orient){
-	    		val = Global.BFS_V3;
-	    		temp_inc =  yy;
+	    	else if (lv_carSize == 3 && lv_orient){
+	    		lv_val = Global.BFS_V3;
+	    		lv_increment =  lv_y;
 	    	}
-	    	
-	    	
-	    	while(size_car > 0){
-	    		if(!l_orient){
-	    			darray[yy][temp_inc] = val;
-	    			temp_inc = temp_inc + 1;
+	    	    	
+	    	while(lv_carSize > 0){
+	    		if(!lv_orient){
+	    			lv_arrMap[lv_y][lv_increment] = lv_val;
+	    			lv_increment = lv_increment + 1;
 	    		}
 	    		else{
-	    			darray[temp_inc][xx] = val;
-		    		temp_inc = temp_inc + 1;
+	    			lv_arrMap[lv_increment][lv_x] = lv_val;
+	    			lv_increment = lv_increment + 1;
 	    		}
-	    			
-	    		size_car = size_car - 1;
-					
-				}
-	    	interations+=1;
-	    	}
-	
+	    		lv_carSize = lv_carSize - 1;
+		
+			}
+	    	
+	    	lv_interations+=1;
+	    }
 	    
 	    //Mapping to string
 		for(int a=0; a < gridsize; a++){
 			for(int b=0; b < gridsize; b++)
-				lv_map_builder.append(darray[a][b]);
+				lv_map_builder.append(lv_arrMap[a][b]);
 		}
 		arr_bfsMaps.add(lv_map_builder.toString());   
 	}
 	
 	
-	
-	
-	
-	private static class CarRec {
+	private static class Obstacle {
 		boolean orient;
 		int size;
 		int x;
 		int y;
 	}
-
 }
